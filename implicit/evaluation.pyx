@@ -43,7 +43,7 @@ def train_test_split(ratings, train_percentage=0.8):
 
 @cython.boundscheck(False)
 def precision_at_k(model, train_user_items, test_user_items, int K=10,
-                   show_progress=True, int num_threads=0):
+                   show_progress=True, int num_threads=1):
     """ Calculates P@K for a given trained model
 
     Parameters
@@ -60,7 +60,9 @@ def precision_at_k(model, train_user_items, test_user_items, int K=10,
         Whether to show a progress bar
     num_threads : int, optional
         The number of threads to use for testing. Specifying 0 means to default
-        to the number of cores on the machine.
+        to the number of cores on the machine. Note: aside from the ALS and BPR
+        models, setting this to more than 1 will likely hurt performance rather than
+        help.
 
     Returns
     -------
