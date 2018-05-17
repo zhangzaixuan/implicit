@@ -6,6 +6,7 @@ from cython.operator import dereference
 from cython.parallel import parallel, prange
 from libc.stdlib cimport malloc, free
 from libc.string cimport memset
+from libc.math cimport fmin
 
 from libcpp.unordered_set cimport unordered_set
 
@@ -90,7 +91,6 @@ def precision_at_k(model, train_user_items, test_user_items, int K=10,
                     recs = model.recommend(u, train_user_items, N=K)
                     for i in range(len(recs)):
                         ids[i] = recs[i][0]
-                    total += len(recs)
                     progress.update(1)
 
                 # mostly we're going to be blocked on the gil here,
@@ -98,6 +98,8 @@ def precision_at_k(model, train_user_items, test_user_items, int K=10,
                 likes.clear()
                 for i in range(test_indptr[u], test_indptr[u+1]):
                     likes.insert(test_indices[i])
+
+                total += fmin(K, likes.size())
 
                 for i in range(K):
                     if likes.find(ids[i]) != likes.end():
